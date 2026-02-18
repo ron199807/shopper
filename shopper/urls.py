@@ -7,6 +7,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse
 from . import views
+from apps.bids import views as bids_views
+from apps.lists import views as lists_views
+from apps.reviews import views as reviews_views
+from apps.transactions import views as transactions_views
+from apps.users import views as users_views
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -27,7 +32,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('apps.users.urls')),
     path('api-auth/', include('rest_framework.urls')),
-    
+    # App-specific API endpoints
+    path('api/lists/', include('apps.lists.urls')),
+
     # API root
     path('api/', include(api_patterns)),
     
