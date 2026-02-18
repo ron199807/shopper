@@ -17,11 +17,7 @@ api_patterns = [
     # Authentication endpoints
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    
-    # App endpoints (to be added later)
-    # path('users/', include('apps.users.urls')),
-    # path('products/', include('apps.products.urls')),
-    # path('orders/', include('apps.orders.urls')),
+
 ]
 
 urlpatterns = [
@@ -29,6 +25,8 @@ urlpatterns = [
     path('', views.home, name='home'),
     # Admin site
     path('admin/', admin.site.urls),
+    path('api/users/', include('apps.users.urls')),
+    path('api-auth/', include('rest_framework.urls')),
     
     # API root
     path('api/', include(api_patterns)),
