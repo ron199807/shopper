@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: shopbid
+      MYSQL_USER: shopbid_user
+      MYSQL_PASSWORD: shopbid_password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    command: 
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=1000
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      - DB_HOST=mysql
+      - DB_NAME=shopbid
+      - DB_USER=shopbid_user
+      - DB_PASSWORD=shopbid_password
+      - DB_PORT=3306
+      - REDIS_URL=redis://redis:6379/0
+
+  celery:
+    build: .
+    command: celery -A shopbid_core worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - mysql
+      - redis
+      - web
+
+volumes:
+  mysql_data:
