@@ -1,7 +1,7 @@
 # Shopper Application
 
 ## Project Overview
-The Shopper application is a modern e-commerce platform built with Django, allowing users to browse products, manage their carts, and complete purchases online. It utilizes best practices for web application development, ensuring scalability and maintainability.
+The Shopper application is a modern e-commerce platform built with Django, allowing users to be a Client, Shopper or both. That allows a client to post a shopping list and shoppers can bid for the list and the owner(owner) of the list will offer the job of shopping to the shopper they choose. And the user who registers as both will be able to both post a list and they can also bid for the list.
 
 ## Setup Instructions
 1. **Clone the repository**:
@@ -40,15 +40,13 @@ The Shopper application is a modern e-commerce platform built with Django, allow
 
 ## Features
 - User authentication and profiles
-- Product listing with a detailed view
-- Cart management with addition and deletion of items
-- Order processing and payments
-- Admin interface for managing products and orders
+- Shopping list Listing
+- Bding for the list and when we have a winner all the other bids will bemarked lost
 
 ## Technology Stack
 - **Backend**: Django, Python
 - **Database**: PostgreSQL (or SQLite for development)
-- **Frontend**: HTML, CSS, JavaScript
+- **Frontend**: Next.js, Tailwind css, TypeScript
 - **Deployment**: Docker, AWS (for production)
 
 ## Project Structure
@@ -69,11 +67,6 @@ shopper/
 ``` 
 
 ## Usage Examples
-- **Browsing Products**: Users can view all products on the landing page.
-- **Managing Cart**: Add items using the "Add to Cart" button and view them in the cart section.
-- **Completing Purchase**: Proceed to checkout by confirming the cart and entering shipping information.
-
-
----
-
-For more detailed information, refer to the [documentation](link-to-documentation).
+- **Browsing Products**: Users can view all Shopping Lists on the landing page.
+- **Biding**: only Shoppers/both can bid for the list.
+- **Dashboards**: every user has a dashboard to monitor what is happening in realtime
