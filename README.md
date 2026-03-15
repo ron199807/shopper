@@ -41,7 +41,8 @@ The Shopper application is a modern e-commerce platform built with Django, allow
 ## Features
 - User authentication and profiles
 - Shopping list Listing
-- Bding for the list and when we have a winner all the other bids will bemarked lost
+- Biding for the list and when we have a winner all the other bids will bemarked lost
+- User Dashboard
 
 ## Technology Stack
 - **Backend**: Django, Python
