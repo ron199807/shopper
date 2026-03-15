@@ -10,6 +10,18 @@ from .serializers import (
 )
 from .permissions import IsClient, IsListOwner, IsListOpenForBids
 from apps.bids.models import Bid
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, extend_schema_view
+from drf_spectacular.types import OpenApiTypes
+
+@extend_schema_view(
+    post=extend_schema(
+        tags=['Shopping Lists'],
+        summary="Create a new shopping list",
+        description="Create a new shopping list. Only clients can create lists.",
+        request=CreateShoppingListSerializer,
+        responses={201: ShoppingListSerializer},
+    )
+)
 
 class ClientShoppingListCreateView(generics.CreateAPIView):
     """
@@ -21,6 +33,15 @@ class ClientShoppingListCreateView(generics.CreateAPIView):
     
     def perform_create(self, serializer):
         serializer.save()
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=['Shopping Lists'],
+        summary="Get my shopping lists",
+        description="Get all shopping lists created by the authenticated client.",
+        responses={200: ShoppingListSerializer(many=True)},
+    )
+)
 
 class ClientShoppingListView(generics.ListAPIView):
     """
@@ -34,6 +55,25 @@ class ClientShoppingListView(generics.ListAPIView):
         return ShoppingList.objects.filter(
             client=self.request.user
         ).select_related('client').prefetch_related('bids').order_by('-created_at')
+    
+@extend_schema_view(
+    get=extend_schema(
+        tags=['Shopping Lists'],
+        summary="Get shopping list details",
+        description="Get detailed information about a specific shopping list.",
+        responses={200: ShoppingListSerializer},
+    )
+)
+
+class PublicShoppingListDetailView(generics.RetrieveAPIView):
+    """
+    Public endpoint for viewing any shopping list
+    No authentication required
+    """
+    serializer_class = ShoppingListSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = ShoppingList.objects.all()
+    lookup_field = 'pk'
 
 class ClientShoppingListDetailView(generics.RetrieveAPIView):
     """
@@ -41,10 +81,27 @@ class ClientShoppingListDetailView(generics.RetrieveAPIView):
     Get detailed information about a specific shopping list
     """
     serializer_class = ShoppingListSerializer
-    permission_classes = [permissions.IsAuthenticated, IsClient, IsListOwner]
+    permission_classes = [permissions.AllowAny]
+    queryset = ShoppingList.objects.all()
+    lookup_field = 'pk'
     
     def get_queryset(self):
         return ShoppingList.objects.filter(client=self.request.user)
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=['Shopping Lists'],
+        summary="Get bids on a list",
+        description="Get all bids for a specific shopping list. Only the client who created the list can view bids.",
+        responses={200: BidOnShoppingListSerializer(many=True)},
+    )
+)
 
 class ClientShoppingListBidsView(generics.ListAPIView):
     """
@@ -60,6 +117,14 @@ class ClientShoppingListBidsView(generics.ListAPIView):
             shopping_list_id=shopping_list_id,
             is_active=True
         ).select_related('shopper').order_by('amount')
+    
+
+@extend_schema(
+    tags=['Shopping Lists'],
+    summary="Accept a bid",
+    description="Accept a bid and assign the shopper to the shopping list.",
+    responses={200: ShoppingListSerializer},
+)
 
 class ClientAcceptBidView(APIView):
     """
@@ -83,6 +148,16 @@ class ClientAcceptBidView(APIView):
         
         serializer = ShoppingListSerializer(shopping_list)
         return Response(serializer.data)
+    
+@extend_schema_view(
+    patch=extend_schema(
+        tags=['Shopping Lists'],
+        summary="Update list status",
+        description="Update the status of a shopping list (e.g., cancel).",
+        request=ShoppingListStatusUpdateSerializer,
+        responses={200: ShoppingListSerializer},
+    )
+)
 
 class ClientUpdateListStatusView(generics.UpdateAPIView):
     """
@@ -98,6 +173,15 @@ class ClientUpdateListStatusView(generics.UpdateAPIView):
     def perform_update(self, serializer):
         serializer.save()
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=['Public'],
+        summary="Get open shopping lists",
+        description="Get all shopping lists that are currently open for bidding. Public endpoint - no authentication required.",
+        responses={200: ShoppingListSerializer(many=True)},
+    )
+)
+
 class OpenShoppingListsView(generics.ListAPIView):
     """
     GET /api/lists/open/
@@ -112,6 +196,20 @@ class OpenShoppingListsView(generics.ListAPIView):
             status='open',
             bidding_deadline__gt=now
         ).select_related('client').order_by('-created_at')[:50]  # Limit to 50 most recent
+    
+@extend_schema_view(
+    get=extend_schema(
+        tags=['Public'],
+        summary="Get nearby shopping lists",
+        description="Get open shopping lists near a specified location.",
+        parameters=[
+            OpenApiParameter(name='lat', description='Latitude', required=True, type=float),
+            OpenApiParameter(name='lng', description='Longitude', required=True, type=float),
+            OpenApiParameter(name='radius', description='Search radius in miles/km', required=False, type=float),
+        ],
+        responses={200: ShoppingListSerializer(many=True)},
+    )
+)
 
 class NearbyShoppingListsView(generics.ListAPIView):
     """

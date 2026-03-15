@@ -1,6 +1,3 @@
-"""
-Main URL Configuration
-"""
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -15,6 +12,11 @@ from apps.users import views as users_views
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
+)
+from drf_spectacular.views import (
+    SpectacularAPIView, 
+    SpectacularSwaggerView, 
+    SpectacularRedocView
 )
 
 # API URL patterns
@@ -34,12 +36,15 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     # App-specific API endpoints
     path('api/lists/', include('apps.lists.urls')),
-
-    # API root
-    path('api/', include(api_patterns)),
+    path('api/bids/', include('apps.bids.urls')),
     
     # Health check
     path('health/', lambda request: HttpResponse("OK"), name='health_check'),
+
+    # API schema and documentation
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
 
 # Serve media files in development

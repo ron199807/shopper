@@ -9,6 +9,7 @@ urlpatterns = [
     path('<int:pk>/bids/', views.ClientShoppingListBidsView.as_view(), name='list-bids'),
     path('<int:pk>/accept-bid/<int:bid_id>/', views.ClientAcceptBidView.as_view(), name='accept-bid'),
     path('<int:pk>/status/', views.ClientUpdateListStatusView.as_view(), name='update-status'),
+    path('public/<int:pk>/', views.PublicShoppingListDetailView.as_view(), name='public-list-detail'),
     
     # Public endpoints
     path('open/', views.OpenShoppingListsView.as_view(), name='open-lists'),

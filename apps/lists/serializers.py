@@ -78,6 +78,21 @@ class CreateShoppingListSerializer(serializers.ModelSerializer):
         
         return value
     
+    def validate(self, data):
+        # Validate that bidding_deadline is in the future
+        if data['bidding_deadline'] <= timezone.now():
+            raise serializers.ValidationError({
+                'bidding_deadline': 'Bidding deadline must be in the future'
+            })
+        
+        # Validate that preferred_delivery_time is after bidding_deadline
+        if data['preferred_delivery_time'] <= data['bidding_deadline']:
+            raise serializers.ValidationError({
+                'preferred_delivery_time': 'Delivery time must be after bidding deadline'
+            })
+        
+        return data
+    
     def create(self, validated_data):
         items_data = validated_data.pop('items_data', [])
         

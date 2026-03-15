@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from datetime import timedelta
 
 class ShoppingList(models.Model):
     STATUS_CHOICES = (
@@ -37,13 +38,13 @@ class ShoppingList(models.Model):
     estimated_total = models.DecimalField(max_digits=10, decimal_places=2)
     max_budget = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     
-    # Fees (your platform commission)
+    # Fees (platform commission)
     platform_fee_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
     
     # Timeline
     preferred_delivery_time = models.DateTimeField()
     bidding_deadline = models.DateTimeField()
-    expires_at = models.DateTimeField()
+    expires_at = models.DateTimeField(null=True, blank=True)
     
     # Location for distance calculation
     delivery_latitude = models.DecimalField(max_digits=9, decimal_places=6)
@@ -77,6 +78,12 @@ class ShoppingList(models.Model):
     
     def __str__(self):
         return f"{self.title} - {self.client.email}"
+    
+    def save(self, *args, **kwargs):
+    # Auto-set expires_at to 30 days after bidding_deadline if not provided
+        if not self.expires_at and self.bidding_deadline:
+            self.expires_at = self.bidding_deadline + timedelta(days=30)
+        super().save(*args, **kwargs)
     
     @property
     def bid_count(self):

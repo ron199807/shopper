@@ -165,6 +165,51 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
+# drf-spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Shopper Bidding Platform API',
+    'DESCRIPTION': '''
+        API for a shopping list bidding platform where clients post shopping lists 
+        and shoppers bid to fulfill them.
+        
+        ## Features
+        * User authentication with JWT
+        * Clients can create shopping lists
+        * Shoppers can browse available lists and place bids
+        * Clients can view bids and accept the best one
+        * Real-time updates via WebSockets (coming soon)
+        
+        ## User Types
+        * **Client**: Can create shopping lists and accept bids
+        * **Shopper**: Can browse lists and place bids
+        * **Both**: Can perform both client and shopper actions
+        
+        ## Authentication
+        Use the `/api/users/login/` endpoint to obtain JWT tokens. 
+        Include the access token in the Authorization header for authenticated requests:
+        ```
+        Authorization: Bearer <your_access_token>
+        ```
+    ''',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': '/api/',
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
+    'TAGS': [
+        {'name': 'Authentication', 'description': 'User registration and login'},
+        {'name': 'Users', 'description': 'User profile management'},
+        {'name': 'Shopping Lists', 'description': 'Create and manage shopping lists'},
+        {'name': 'Bids', 'description': 'Place and manage bids'},
+        {'name': 'Dashboard', 'description': 'Shopper dashboard and statistics'},
+        {'name': 'Public', 'description': 'Public endpoints (no authentication required)'},
+    ],
+}
+
 # Allauth settings
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -198,6 +243,27 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
 # Celery settings
